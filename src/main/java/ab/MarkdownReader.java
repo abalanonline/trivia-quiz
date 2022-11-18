@@ -41,7 +41,7 @@ public class MarkdownReader {
     String[] split = BREAK_PATTERN.split(inputString);
     return Arrays.stream(split).map(s -> {
       Matcher questionMatcher = QUESTION_PATTERN.matcher(s);
-      if (!questionMatcher.matches()) throw new IllegalStateException();
+      if (!questionMatcher.matches()) throw new IllegalStateException(s);
       TriviaQuestion triviaQuestion = new TriviaQuestion();
       triviaQuestion.question = questionMatcher.group("question");
       triviaQuestion.answer = questionMatcher.group("answer");
