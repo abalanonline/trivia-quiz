@@ -16,15 +16,21 @@
 
 package ab;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class TriviaController {
 
+  @Autowired
+  List<TriviaQuestion> triviaQuestions;
+
   @GetMapping
   public String get() {
-    return "Who was the first cat in space?";
+    return triviaQuestions.get(0).question;
   }
 
 }

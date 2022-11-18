@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
 public class MarkdownReader {
 
   public static final Pattern BREAK_PATTERN = Pattern.compile("\\*\\*\\*+\\n+");
-  public static final String BREAK_STRING = "***\\n\\n";
+  public static final String BREAK_STRING = "***";
   public static final Pattern QUESTION_PATTERN = Pattern.compile(
-      "(?<question>.+)\\n\\n(?<choices>([*+-]\\s[^\\n]+\\n)+)\\n(?<answer>.*)", Pattern.DOTALL);
+      "(?<question>.+)\\n\\n(?<choices>([*+-]\\s[^\\n]+\\n)+)\\n((?<answer>.*)\\n\\n)?", Pattern.DOTALL);
   public static final Pattern CHOICES_PATTERN = Pattern.compile(
       "([*+-])\\s([^\\n]+)\\n", Pattern.DOTALL);
 
@@ -67,8 +67,14 @@ public class MarkdownReader {
 
   public static void writeQuestions(OutputStream outputStream, List<TriviaQuestion> triviaQuestions) {
     PrintWriter printWriter = new PrintWriter(outputStream);
-    triviaQuestions.forEach(triviaQuestion -> {
-      printWriter.println(triviaQuestion.question);
+    for (int triviaQuestionIndex = 0; triviaQuestionIndex < triviaQuestions.size(); triviaQuestionIndex++) {
+      if (triviaQuestionIndex != 0) {
+        printWriter.print(BREAK_STRING);
+        printWriter.print("\n\n");
+      }
+      TriviaQuestion triviaQuestion = triviaQuestions.get(triviaQuestionIndex);
+      printWriter.print(triviaQuestion.question);
+      printWriter.print("\n\n");
       char correctChar = triviaQuestion.multipleAnswers ? '+' : '*';
       for (int i = 0; i < triviaQuestion.choices.size(); i++) {
         printWriter.print(triviaQuestion.correct.get(i) ? correctChar : '-');
@@ -76,7 +82,12 @@ public class MarkdownReader {
         printWriter.print(triviaQuestion.choices.get(i));
         printWriter.print('\n');
       }
-    });
+      printWriter.print('\n');
+      if (triviaQuestion.answer != null) {
+        printWriter.print(triviaQuestion.answer);
+        printWriter.print("\n\n");
+      }
+    }
     printWriter.flush();
   }
 }
