@@ -16,22 +16,12 @@
 
 package ab;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-
 import java.util.List;
 
-@SpringBootApplication
-public class TriviaApplication {
-
-  @Bean
-  public List<TriviaQuestion> getQuestions() {
-    return MarkdownReader.readQuestions(getClass().getResourceAsStream("/startrek.md"));
-  }
-
-  public static void main(String[] args) {
-    SpringApplication.run(TriviaApplication.class, args);
-  }
-
+public class TriviaQuestion {
+  public String question;
+  public List<String> choices;
+  public List<Boolean> correct;
+  public boolean multipleAnswers;
+  public String answer;
 }
