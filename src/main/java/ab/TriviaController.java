@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -28,9 +29,15 @@ public class TriviaController {
   @Autowired
   List<TriviaQuestion> triviaQuestions;
 
+  @Autowired
+  MustacheService ms;
+
   @GetMapping
   public String get() {
-    return triviaQuestions.get(0).question;
+    return ms.apply("index",
+        "title", "index page",
+        "time", Instant.now().toString(),
+        "question", triviaQuestions.get(0).question);
   }
 
 }
