@@ -26,7 +26,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -45,20 +48,36 @@ public class MustacheService {
     this.mustacheFactory = mustacheFactory;
   }
 
-  public String apply(String template, String... arguments) {
+  private String applyObject(String template, Object object) {
     Mustache mustache = templates.computeIfAbsent(template,
         templateName -> mustacheFactory.compile(String.format(RESOURCE_TEMPLATE, templateName)));
-    Map<String, String> scopes = new HashMap<>();
-    for (int i = 1; i < arguments.length; i += 2) {
-      scopes.put(arguments[i - 1], arguments[i]);
-    }
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     try {
-      mustache.execute(new OutputStreamWriter(outputStream), scopes).flush();
+      mustache.execute(new OutputStreamWriter(outputStream), object).flush();
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
     return new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+  }
+
+  public String apply(String template, String... keysValues) {
+    Map<String, String> scopes = new HashMap<>();
+    for (int i = 1; i < keysValues.length; i += 2) {
+      scopes.put(keysValues[i - 1], keysValues[i]);
+    }
+    return applyObject(template, scopes);
+  }
+
+  public String apply(String template, String[][] values, String... keys) {
+    List<Map<String, String>> scopes = new ArrayList<>();
+    for (String[] value : values) {
+      Map<String, String> map = new HashMap<>();
+      for (int i = 0; i < keys.length; i++) {
+        map.put(keys[i], value[i]);
+      }
+      scopes.add(map);
+    }
+    return applyObject(template, Collections.singletonMap("items", scopes));
   }
 
 }

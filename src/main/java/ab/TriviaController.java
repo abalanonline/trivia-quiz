@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @RestController
 public class TriviaController {
@@ -34,10 +35,17 @@ public class TriviaController {
 
   @GetMapping
   public String get() {
+    TriviaQuestion triviaQuestion = triviaQuestions.get(0);
+    List<String> choices = triviaQuestion.choices;
     return ms.apply("index",
         "title", "index page",
         "time", Instant.now().toString(),
-        "question", triviaQuestions.get(0).question);
+        "choices", ms.apply(triviaQuestion.multipleAnswers ? "checkbox" : "radio",
+            IntStream.range(0, choices.size())
+                .mapToObj(i -> new String[]{Integer.toString(i), choices.get(i)}).toArray(String[][]::new),
+            "id", "text"
+            ),
+        "question", triviaQuestion.question);
   }
 
 }

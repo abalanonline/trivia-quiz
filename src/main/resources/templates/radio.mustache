@@ -1,0 +1,10 @@
+
+<form>
+<ul>
+{{#items}}
+  <li><input type="radio" id="label{{id}}" name="a" value="{{id}}">
+  <label for="label{{id}}">{{text}}</label></li>
+{{/items}}
+</ul>
+<input type="submit" name="submit">
+</form>
